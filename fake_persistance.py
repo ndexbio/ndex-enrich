@@ -73,9 +73,9 @@ def get_id_set_data(e_set_name, id_set_file_name):
     file.close()
     return data
 
-def save_id_set_dict(e_set_name, id_set_name, id_set_dict):
+def save_id_set_dict(e_set_name, id_set_id, id_set_dict):
     e_set_dir = ensure_e_set_dir(e_set_name)
-    filename = join(e_set_dir, id_set_name + ".json")
+    filename = join(e_set_dir, id_set_id + ".json")
     file = open(filename, "w")
     json.dump(id_set_dict, file)
     file.close()

@@ -31,9 +31,9 @@ class EnrichmentData():
         e_set = self.get_e_set(e_set_name)
         return e_set.get_id_set_names()
 
-    def get_id_set(self, e_set_name, id_set_name):
+    def get_id_set(self, e_set_name, id_set_id):
         e_set = self.get_e_set(e_set_name)
-        return e_set.get_id_set(id_set_name)
+        return e_set.get_id_set(id_set_id)
 
     def add_e_set (self, e_set_name):
         e_set_name = e_set_name.lower()
@@ -79,12 +79,11 @@ class EnrichmentSet():
         for set_name, id_set in self.id_set_map.iteritems():
             id_set.save()
 
-
     def get_id_set_names(self):
         return self.id_set_map.keys()
 
-    def get_id_set(self, id_set_name):
-        return self.id_set_map.get(id_set_name)
+    def get_id_set(self, id_set_id):
+        return self.id_set_map.get(id_set_id)
 
     def get_id_set_by_network_id(self, network_id):
         for id_set in self.id_set_map.values():
@@ -95,7 +94,7 @@ class EnrichmentSet():
     # create a new id_set in this e_set based on
     # a name and a list of id strings
     def add_id_set (self, id_set):
-        self.id_set_map[id_set.name] = id_set
+        self.id_set_map[id_set.network_id] = id_set
         self.update()
 
     def update(self):
@@ -112,11 +111,12 @@ class EnrichmentSet():
         scores = []
         M = len(self.objects)
         coverage = Coverage(query_id_set)
-        for set_name, id_set in self.id_set_map.iteritems():
-            score = id_set.get_enrichment_score(query_id_set, M, set_name)
+        for set_id, id_set in self.id_set_map.iteritems():
+            score = id_set.get_enrichment_score(query_id_set, M, set_id)
             coverage.add_score(score)
-            scores.append(score)
-        return scores, coverage
+            scores.append(score.to_dict())
+        result = {"scores" : scores, "coverage" : coverage.to_dict()}
+        return result
 
 class Coverage():
 
@@ -132,6 +132,9 @@ class Coverage():
 
     def get_sorted_ids(self):
         return sorted(self.map.items(), key=itemgetter(1))
+
+    def to_dict(self):
+        return self.get_sorted_ids()
 
 class IdentifierSet():
     def __init__(self, id_set_dict):
@@ -152,14 +155,14 @@ class IdentifierSet():
         }
 
     def save(self):
-        storage.save_id_set_dict(self.e_set, self.name, self.to_dict())
+        storage.save_id_set_dict(self.e_set, self.network_id, self.to_dict())
 
     # compare this id_set to a query_id_set
-    def get_enrichment_score(this, query_id_set, M, set_name):
-        overlap = query_id_set.set & this.set
+    def get_enrichment_score(self, query_id_set, M, set_name):
+        overlap = query_id_set.set & self.set
         k = len(overlap)
-        pv = hypergeom(M, this.n, query_id_set.n).sf(k)
-        return EnrichmentScore(pv, k, overlap, set_name)
+        pv = hypergeom(M, self.n, query_id_set.n).sf(k)
+        return EnrichmentScore(pv, k, overlap, self.name)
 
 class EnrichmentScore():
 
@@ -171,6 +174,14 @@ class EnrichmentScore():
 
     def format(self):
         return self.set_name + "  pv: " + str(self.pv) + " k:" + str(self.k)
+
+    def to_dict(self):
+        return {
+            "k" : self.k,
+            "pv" : self.pv,
+            "overlap" : list(self.overlap),
+            "set_name" : self.set_name
+        }
 
 
 
