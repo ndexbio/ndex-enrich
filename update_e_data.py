@@ -38,26 +38,25 @@ rebuild = False
 if arg.rebuild.lower() is "true":
     rebuild = True
 
-config = conf.Configuration()
+config = conf.EServerConfiguration()
+
 # Load the testing configuration
 config.load(True)
 
-
-if len(config.get_all_e_set_configs()) is 0:
+if len(config.e_set_configs) is 0:
     print "No enrichment sets are specified in the configuration"
     sys.exit()
 
-e_set_config_to_update = config.get_eset_config(arg.eset)
+e_set_config_to_update = config.get_e_set_config(arg.eset)
 
 if not e_set_config_to_update:
     print "No enrichment set in configuration file for name: " + arg.eset
     print "The configured enrichment sets are:"
-    for e_set_config in config.eset_configs:
+    for e_set_config in config.e_set_configs:
         print str(e_set_config)
     sys.exit()
 
-e_updater = updater.Updater(e_set_config_to_update)
-e_updater.update(rebuild)
+updater.update(e_set_config_to_update, rebuild)
 
 print "Update complete"
 

@@ -20,7 +20,7 @@ query_ids = [
 e_data = dm.EnrichmentData()
 
 # create one e_set in e_data
-e_data.add_enrichment_set(e_set_name)
+e_data.add_e_set(e_set_name)
 
 n_access = na.NdexAccess(ndex_host)
 

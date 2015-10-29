@@ -15,7 +15,7 @@ class EServerConfiguration():
         if test_mode:
             test_config = ESetConfiguration('test')
             # set parameters
-            test_config.host = "dev2.ndexbio.org"
+            test_config.host = "http://dev2.ndexbio.org"
             test_config.account_name = "enrichtest"
             test_config.query_limit = 100
 
@@ -26,7 +26,7 @@ class EServerConfiguration():
 class ESetConfiguration():
     def __init__(self, name):
         self.name = name
-        self.host = "public.ndexbio.org"
+        self.host = "http://public.ndexbio.org"
         self.username = None
         self.password = None
         self.type = "QUERY"
@@ -34,4 +34,5 @@ class ESetConfiguration():
         self.id_list = []
         self.query_string = ""
         self.query_limit = 20
+        self.id_prefix = "HGNC Symbol"
 
