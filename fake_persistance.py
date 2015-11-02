@@ -60,8 +60,10 @@ def remove_id_set(e_set_name, id_set_name):
     remove(filename)
 
 def remove_all_id_sets(e_set_name):
-    for file in get_id_set_file_names(e_set_name):
-        remove(file)
+    dirpath = e_set_dir_name(e_set_name)
+    for filename in listdir(dirpath):
+        path = join(dirpath, filename)
+        remove(path)
 
 def get_id_set_data(e_set_name, id_set_file_name):
     base = basename(id_set_file_name)
@@ -80,6 +82,13 @@ def save_id_set_dict(e_set_name, id_set_id, id_set_dict):
     json.dump(id_set_dict, file)
     file.close()
 
+def get_e_set_configs(name="config"):
+    current_directory = dirname(abspath(__file__))
+    filename = join(current_directory, "e_service_configuration", name + ".json")
+    file = open(filename, "r")
+    data = json.load(file)
+    file.close()
+    return data
 
 
 

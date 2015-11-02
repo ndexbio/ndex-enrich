@@ -20,6 +20,11 @@ __author__ = 'dexter'
 # Note that this operation can be performed while the enrichment server is running.
 # The enrichment server loads its e_sets at start time
 
+#
+# usage:
+#
+# python update_e_data.py config_example --rebuild
+
 # body
 
 import argparse
@@ -29,37 +34,37 @@ import sys
 
 parser = argparse.ArgumentParser(description='update an e_set')
 
-parser.add_argument('eset', action='store')
-parser.add_argument('rebuild', action='store')
+parser.add_argument('config', action='store')
+parser.add_argument('--test', dest='test', action='store_const',
+                    const=True, default=False,
+                    help='use the test configuration')
+
+parser.add_argument('--rebuild', dest='rebuild', action='store_const',
+                    const=True, default=False,
+                    help='rebuild all the cached e_sets')
 
 arg = parser.parse_args()
 
-rebuild = False
-if arg.rebuild.lower() is "true":
-    rebuild = True
-
-config = conf.EServerConfiguration()
+config = conf.EServiceConfiguration()
 
 # Load the testing configuration
-config.load(True)
+config.load(arg.config)
 
 if len(config.e_set_configs) is 0:
     print "No enrichment sets are specified in the configuration"
     sys.exit()
 
-e_set_config_to_update = config.get_e_set_config(arg.eset)
+for e_set_config in config.e_set_configs:
 
-if not e_set_config_to_update:
-    print "No enrichment set in configuration file for name: " + arg.eset
-    print "The configured enrichment sets are:"
-    for e_set_config in config.e_set_configs:
-        print str(e_set_config)
-    sys.exit()
-
-updater.update(e_set_config_to_update, rebuild)
+    updater.update(e_set_config, arg.rebuild)
 
 print "Update complete"
 
 
 
-
+# if not e_set_config_to_update:
+#     print "No enrichment set in configuration file for name: " + arg.eset
+#     print "The configured enrichment sets are:"
+#     for e_set_config in config.e_set_configs:
+#         print str(e_set_config)
+#     sys.exit()

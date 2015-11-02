@@ -1,7 +1,7 @@
 __author__ = 'dexter'
 
 from scipy.stats import hypergeom
-from operator import itemgetter
+from operator import itemgetter, attrgetter
 from os.path import join, isdir
 from os import listdir
 import fake_persistance as storage
@@ -115,6 +115,7 @@ class EnrichmentSet():
             score = id_set.get_enrichment_score(query_id_set, M, set_id)
             coverage.add_score(score)
             scores.append(score.to_dict())
+        scores = sorted(scores, key=itemgetter('pv'))
         result = {"scores" : scores, "coverage" : coverage.to_dict()}
         return result
 

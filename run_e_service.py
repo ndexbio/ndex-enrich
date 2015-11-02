@@ -7,6 +7,12 @@ __author__ = 'dexter'
 # The optional argument 'verbose' specifies verbose logging for testing
 #
 
+#
+# python run_e_service.py
+#
+# python run_e_service.py --verbose
+#
+
 # body
 
 import argparse
@@ -16,22 +22,23 @@ import json
 
 parser = argparse.ArgumentParser(description='run the enrichment server')
 
-parser.add_argument('verbose', action='store')
+parser.add_argument('--verbose', dest='verbose', action='store_const',
+                    const=True, default=False,
+                    help='verbose mode')
 
 arg = parser.parse_args()
 
-if arg.verbose.lower() == "true":
+if arg.verbose:
     print "Starting enrichment server in verbose mode"
-    verbose = True
 else:
     print "Starting enrichment server"
-    verbose = False
+
 
 e_data = dm.EnrichmentData("e_sets")
 e_data.load()
 app = default_app()
 app.config['enrichment_data'] = e_data
-app.config['enrichment_verbose'] = verbose
+app.config['enrichment_verbose'] = arg.verbose
 
 @route('/hello/<name>')
 def index(name):

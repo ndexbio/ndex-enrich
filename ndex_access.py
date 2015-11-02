@@ -11,14 +11,22 @@ class NdexAccess():
     def get_ids(self, prefix, network_id):
         network = self.ndex.get_complete_network(network_id)
         ids = []
-        for term in network.get("baseTerms").values():
-            name = term.get("name")
-            components = name.split(":")
-            if len(components) > 1:
-                term_prefix = components[0]
-                id = components[1]
-            if id and term_prefix and term_prefix == prefix:
-                ids.append(id)
+        if prefix == "name":
+            for node in network.get("nodes").values():
+                if node.get("name"):
+                    ids.append(node.get("name"))
+
+        else:
+            for term in network.get("baseTerms").values():
+                name = term.get("name")
+                components = name.split(":")
+                id = False
+                term_prefix = False
+                if len(components) > 1:
+                    term_prefix = components[0]
+                    id = components[1]
+                if id and term_prefix and term_prefix == prefix:
+                    ids.append(id)
         return ids
 
     def find_networks(self, id_set_config):

@@ -15,7 +15,7 @@ def update(e_set_config, rebuild = False):
         storage.ensure_e_set_dir(e_set_config.name)
         e_set.load()
 
-        na = ndex_access.NdexAccess(e_set_config.host)
+        na = ndex_access.NdexAccess(e_set_config.ndex)
 
         # Find the candidate networks
         networks = na.find_networks(e_set_config)
@@ -52,7 +52,7 @@ def update(e_set_config, rebuild = False):
                 "name": network_name,
                 "ids": ids,
                 "network_id": network_id,
-                "ndex" : e_set_config.host,
+                "ndex" : e_set_config.ndex,
                 "e_set" : e_set_config.name
             }
             id_set = dm.IdentifierSet(id_set_dict)

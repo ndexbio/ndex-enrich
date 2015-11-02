@@ -4,7 +4,11 @@ import data_model as dm
 import ndex_access as na
 from operator import attrgetter
 
-# Testing enrichment components
+# this is currently a scratchpad script for
+# testing e_service components
+
+# This is just an internal development script
+# Not intended for use by collaborators
 
 ndex_host = "http://dev2.ndexbio.org"
 ndex_e_set_account_name = "enrichtest"
