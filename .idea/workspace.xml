@@ -2,16 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3291f0f9-673c-4dd9-9b6a-b76b7e8f8a63" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/e_service_configuration/config_example.json" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/run_e_server.py" afterPath="$PROJECT_DIR$/run_e_service.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/configuration.py" afterPath="$PROJECT_DIR$/configuration.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_model.py" afterPath="$PROJECT_DIR$/data_model.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fake_persistance.py" afterPath="$PROJECT_DIR$/fake_persistance.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ndex_access.py" afterPath="$PROJECT_DIR$/ndex_access.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_enrich.py" afterPath="$PROJECT_DIR$/test_enrich.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/update_e_data.py" afterPath="$PROJECT_DIR$/update_e_data.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/updater.py" afterPath="$PROJECT_DIR$/updater.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="ndex-enrich.iws" />
@@ -67,8 +57,8 @@
       <file leaf-file-name="data_model.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.77040815" vertical-offset="1377" max-vertical-offset="2925">
-              <caret line="122" column="0" selection-start-line="122" selection-start-column="0" selection-end-line="122" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.74489796" vertical-offset="1377" max-vertical-offset="2925">
+              <caret line="121" column="17" selection-start-line="121" selection-start-column="17" selection-end-line="121" selection-end-column="17" />
               <folding>
                 <element signature="e#23#56#0" expanded="true" />
               </folding>
@@ -111,7 +101,7 @@
       <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-6.0" vertical-offset="0" max-vertical-offset="585">
+            <state vertical-scroll-proportion="-6.0" vertical-offset="0" max-vertical-offset="630">
               <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
               <folding />
             </state>
@@ -165,8 +155,8 @@
     <detection-done>true</detection-done>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="972" />
-    <option name="y" value="329" />
+    <option name="x" value="73" />
+    <option name="y" value="30" />
     <option name="width" value="1400" />
     <option name="height" value="877" />
   </component>
@@ -537,7 +527,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="972" y="329" width="1400" height="877" extended-state="0" />
+    <frame x="73" y="30" width="1400" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -917,8 +907,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.77040815" vertical-offset="1377" max-vertical-offset="2925">
-          <caret line="122" column="0" selection-start-line="122" selection-start-column="0" selection-end-line="122" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.74489796" vertical-offset="1377" max-vertical-offset="2925">
+          <caret line="121" column="17" selection-start-line="121" selection-start-column="17" selection-end-line="121" selection-end-column="17" />
           <folding>
             <element signature="e#23#56#0" expanded="true" />
           </folding>

@@ -60,6 +60,7 @@ target/
 .idea/workspace.xml
 .idea
 .idea/*
+/.idea/workspace.xml
 
 
 e_sets/*
