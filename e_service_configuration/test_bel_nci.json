@@ -1,0 +1,23 @@
+{
+  "e_sets":[
+    {
+      "name": "BEL_test",
+      "ndex": "http://public.ndexbio.org",
+      "type": "IDLIST",
+      "id_list": [ "55c84fa4-01b4-11e5-ac0f-000c29cb28fb"],
+      "id_prefix": "HGNC"
+
+    },
+    {
+      "name": "NCI_test",
+      "ndex": "http://public.ndexbio.org",
+      "type": "QUERY",
+      "account_name": "nci-pid",
+      "query_limit": 1000,
+      "source_format" : "SIF",
+      "id_prefix": "HGNC_SYMBOL"
+
+    }
+
+  ]
+}

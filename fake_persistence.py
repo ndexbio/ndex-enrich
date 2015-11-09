@@ -2,18 +2,19 @@ __author__ = 'dexter'
 
 from os import listdir, makedirs
 from os.path import isfile, isdir, join, abspath, dirname, exists, basename, splitext
+import csv
+import data_model as dm
+import json
+from os import remove
 
-# This fake persistance system just uses the local directory and
+# e_data persistence
+# This persistence system uses a local directory
 # has a structure of:
 #
 # e_sets
 #       /e_set_name
 #                  /id_set_name.json
 #
-
-import data_model as dm
-import json
-from os import remove
 
 def e_set_dir_name(e_set_name):
     current_directory = dirname(abspath(__file__))
@@ -91,4 +92,26 @@ def get_e_set_configs(name="config"):
     return data
 
 
+# gene_report persistence
+
+def gene_report_file_path(name):
+    gene_report_dir = ensure_gene_report_dir()
+    return join(gene_report_dir, name + ".txt")
+
+def ensure_gene_report_dir():
+    current_directory = dirname(abspath(__file__))
+    path = join(current_directory, "gene_reports")
+    if not isdir(path):
+        print "Creating " + str(path)
+        makedirs(path)
+    return path
+
+def save_gene_report(report):
+    path = gene_report_file_path(report.name)
+    with open(path, 'w') as csvfile:
+        fieldnames = report.fields
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', dialect='excel-tab')
+        writer.writeheader()
+        for row in report.get_rows():
+            writer.writerow(row)
 

@@ -1,11 +1,12 @@
 __author__ = 'dexter'
 
-import fake_persistance as storage
+import fake_persistence as storage
 
 class EServiceConfiguration():
 
     def __init__(self):
         self.e_set_configs =[]
+        self.name = None
 
     def get_e_set_config(self, name):
         for conf in self.e_set_configs:
@@ -14,6 +15,7 @@ class EServiceConfiguration():
         return False
 
     def load(self, config_name, test_mode = False):
+        self.name = config_name
         if test_mode:
             test_config = ESetConfiguration(
                 {"name": 'test',
@@ -42,4 +44,5 @@ class ESetConfiguration():
         self.query_string = config.get('query_string') if config.get('query_string') else ""
         self.query_limit = config.get('query_limit') if config.get('query_limit') else 100
         self.id_prefix = config.get('id_prefix') if config.get('id_prefix') else "HGNC Symbol"
+        self.source_format = config.get('source_format')
 

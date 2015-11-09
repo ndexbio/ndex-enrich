@@ -34,3 +34,31 @@ POSTURL: http://localhost:5601/esets/Cravat NCI/query
 
 POSTDATA: {"ids":["AKT1", "PTK2B", "VGFR1", "CAV1", "CALM2", "PIK3CA", "KPCD", "KPCA"]}
 
+
+___
+
+ndex-enrich also includes the script create_gene_report.py 
+
+This script takes an e_service_configuration and analyzes all of the specified networks to create a tab-delimited report.
+
+The report has the following columns:
+
+Gene Symbol	
+Entrez Gene Id	
+Network Id	
+Network Name	
+Network Sets
+
+"Network Sets" is a comma-separated list of the e_sets in which the network appeared, for cases where e_sets overlap.
+
+Usage:
+
+python create_gene_report.py test_bel_nci 
+
+This script uses the mygene.info REST API to normalize identifiers in networks to genes
+It attempts to map identifiers found attached to the nodes as gene symbols, entrez gene ids, uniprot ids, and ensemble ids.
+It is currently limited to human genes and does not perform any orthology mapping on ids. 
+Identifiers matching human gene symbols are currently assumed to be human.
+
+Status as of 11/9/15: slow operation, successful testing on NCI networks in SIF format
+

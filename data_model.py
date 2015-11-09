@@ -4,7 +4,7 @@ from scipy.stats import hypergeom
 from operator import itemgetter, attrgetter
 from os.path import join, isdir
 from os import listdir
-import fake_persistance as storage
+import fake_persistence as storage
 
 
 # An instance of this class holds all the enrichment sets
@@ -184,6 +184,9 @@ class EnrichmentScore():
             "set_name" : self.set_name
         }
 
-
+class Gene():
+    def __init__(self, symbol, entrez_gene_id):
+        self.symbol = symbol
+        self.id = entrez_gene_id
 
 
