@@ -65,3 +65,4 @@ target/
 
 e_sets/*
 gene_reports/*
+.idea/workspace.xml
