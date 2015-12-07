@@ -21,7 +21,7 @@ query_ids = [
 ]
 
 # Create a fresh data model
-e_data = dm.EnrichmentData()
+e_data = dm.EnrichmentData("e_sets")
 
 # create one e_set in e_data
 e_data.add_e_set(e_set_name)

@@ -58,24 +58,28 @@ def get_e_sets():
 @route('/esets/<esetname>')
 def get_id_sets(esetname):
     e_data = app.config.get("enrichment_data")
-    return e_data.get_id_set_names(esetname)
+    return e_data.get_id_set_names(esetname, url=request.url)
 
 # GET the information for one id_set
 @route('/esets/<esetname>/idsets/<idsetid>')
 def get_id_set(esetname, idsetid):
     e_data = app.config.get("enrichment_data")
     id_set = e_data.get_id_set(esetname, idsetid)
+    if not id_set:
+        return {}
     return id_set.to_dict()
 
 @route('/esets/<esetname>/query', method='POST')
 def run_query(esetname):
+    verbose_mode = app.config.get("enrichment_verbose")
+    e_data = app.config.get("enrichment_data")
     data = request.body
     t = type(data)
     s = str(data)
     dict = json.load(data)
     query_ids = dict.get('ids')
     query_id_set = dm.IdentifierSet({"ids": query_ids})
-    result = e_data.get_scores(esetname, query_id_set)
+    result = e_data.get_scores(esetname, query_id_set, verbose_mode)
     return result
 
 run(app, host='localhost', port=5601)
