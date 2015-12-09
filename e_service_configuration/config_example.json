@@ -1,12 +1,12 @@
 {
   "e_sets":[
     {
-      "name": "Cravat NCI",
+      "name": "cravat_nci",
       "ndex": "http://test.ndexbio.org",
       "type": "QUERY",
       "account_name": "nci-pid",
       "query_limit": 300,
-      "query_string": "PID",
+      "query_string": "pid",
       "id_prefix": "name"
 
     }
