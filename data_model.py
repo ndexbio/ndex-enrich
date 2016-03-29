@@ -13,21 +13,23 @@ class Gene():
 
 class EnrichmentScore():
 
-    def __init__(self, pv, k, overlap, set_name):
+    def __init__(self, pv, k, overlap, set_name, set_id):
         self.k = k
         self.pv = pv
         self.overlap = overlap
         self.set_name = set_name
+        self.set_id = set_id
 
     def format(self):
-        return self.set_name + "  pv: " + str(self.pv) + " k:" + str(self.k)
+        return self.set_id + " " + self.set_name + "  pv: " + str(self.pv) + " k:" + str(self.k)
 
     def to_dict(self):
         return {
             "k" : self.k,
             "pv" : self.pv,
             "overlap" : list(self.overlap),
-            "set_name" : self.set_name
+            "set_name" : self.set_name,
+            "set_id" : self.set_id
         }
 
 class IdentifierSet():
@@ -52,11 +54,13 @@ class IdentifierSet():
         storage.save_id_set_dict(self.e_set, self.network_id, self.to_dict())
 
     # compare this id_set to a query_id_set
-    def get_enrichment_score(self, query_id_set, M, set_name):
-        overlap = query_id_set.set & self.set
-        k = len(overlap)
-        pv = hypergeom(M, self.n, query_id_set.n).sf(k)
-        return EnrichmentScore(pv, k, overlap, self.name)
+    def get_enrichment_score(self, query_id_set_n, M, overlap_n):
+     #   overlap = query_id_set.set & self.set
+     #   k = len(overlap)
+        pv = hypergeom(M, self.n, query_id_set_n).sf(overlap_n)
+        print "m=" +str(M) + " n=" + str(self.n) + " q=" + str(query_id_set_n) + " k=" + str(overlap_n) + " pv=" + str(pv)
+
+        return pv # EnrichmentScore(pv, k, overlap, self.name)
 
 # An instance of this class holds all the enrichment sets
 class EnrichmentData():
@@ -170,16 +174,22 @@ class EnrichmentSet():
         for id_set in self.id_set_map.values():
             self.objects = self.objects | id_set.set
 
-    def get_enrichment_scores(self, query_id_set, verbose=False):
+    def get_enrichment_scores(self, query_id_set_raw, verbose=False):
         scores = []
+
+        coverage = Coverage(query_id_set_raw)
+        query_id_set = IdentifierSet({"ids": (query_id_set_raw.set & self.objects)})
         M = len(self.objects)
-        coverage = Coverage(query_id_set)
         count = 0;
         for set_id, id_set in self.id_set_map.iteritems():
-            score = id_set.get_enrichment_score(query_id_set, M, set_id)
-            coverage.add_score(score)
-            scores.append(score.to_dict())
-            count = count + 1
+            overlap = query_id_set.set & id_set.set
+            k = len(overlap)
+            if k > 0 :
+                score = id_set.get_enrichment_score(query_id_set.n, M, k)
+                coverage.add_score(overlap)
+                scores.append( EnrichmentScore( score, k, overlap, id_set.name, set_id).to_dict())
+                count += 1
+
         if verbose:
             print "Processed " + str(count) + " id_sets, M = " + str(M)
         scores = sorted(scores, key=itemgetter('pv'))
@@ -193,8 +203,8 @@ class Coverage():
         for id in id_set.set:
             self.map[id] = 0
 
-    def add_score(self, score):
-        for id in score.overlap:
+    def add_score(self, overlap):
+        for id in overlap:
             if id in self.map.keys():
                 self.map[id] += 1
 

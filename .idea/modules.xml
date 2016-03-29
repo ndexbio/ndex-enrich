@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/ndex-enrich.iml" filepath="$PROJECT_DIR$/.idea/ndex-enrich.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../ndex-python-client/.idea/ndex-python-client.iml" filepath="$PROJECT_DIR$/../ndex-python-client/.idea/ndex-python-client.iml" />
     </modules>
   </component>
 </project>

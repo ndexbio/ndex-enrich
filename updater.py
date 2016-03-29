@@ -36,7 +36,7 @@ def update(e_set_config, rebuild = False):
             for network in networks:
                 network_id = network.get("externalId")
                 network_name = network.get("name")
-                modification_date = network.get("modificationDate")
+                modification_date = network.get("modificationTime")
                 id_set = e_set.get_id_set_by_network_id(network_id)
                 if id_set:
                     if not id_set.modificationDate == modification_date:
@@ -48,7 +48,7 @@ def update(e_set_config, rebuild = False):
         # Do the updates
         for network_name, network_id in networks_to_update.iteritems():
             print network_name + " : " + network_id
-            ids = na.get_ids(e_set_config.id_prefix, network_id)
+            ids = na.get_genes_cx( network_id)
             id_set_dict = {
                 "name": network_name,
                 "ids": ids,

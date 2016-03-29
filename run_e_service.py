@@ -16,7 +16,7 @@ __author__ = 'dexter'
 # body
 
 import argparse
-from bottle import route, run, template, default_app, request, post
+from bottle import route, run, template, default_app, request, post,  hook, response
 import data_model as dm
 import json
 
@@ -39,6 +39,10 @@ e_data.load()
 app = default_app()
 app.config['enrichment_data'] = e_data
 app.config['enrichment_verbose'] = arg.verbose
+
+@hook('after_request')
+def enable_cors():
+    response.headers['Access-Control-Allow-Origin'] = '*'
 
 @route('/hello/<name>')
 def index(name):
