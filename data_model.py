@@ -11,6 +11,16 @@ class Gene():
         self.symbol = symbol
         self.id = entrez_gene_id
 
+class GeneNodeRelation():
+    def __init__(self, symbol, entrez_gene_id, node_id):
+        self.symbol = symbol
+        self.id = entrez_gene_id
+        self.nodes = set([node_id])
+
+    def add_node (self, node_id):
+        self.nodes.add(node_id)
+
+
 class EnrichmentScore():
 
     def __init__(self, pv, k, overlap, set_name, set_id):
@@ -27,24 +37,25 @@ class EnrichmentScore():
         return {
             "k" : self.k,
             "pv" : self.pv,
-            "overlap" : list(self.overlap),
+            "overlap" : self.overlap,
             "set_name" : self.set_name,
             "set_id" : self.set_id
         }
 
 class IdentifierSet():
     def __init__(self, id_set_dict):
-        self.set = set(id_set_dict.get("ids"))
         self.name = id_set_dict.get("name")
         self.network_id = id_set_dict.get("network_id")
+        self.set = set(id_set_dict.get("ids").keys())
         self.ndex = id_set_dict.get("ndex")
         self.e_set = id_set_dict.get("e_set")
         self.n = len(self.set)
+        self.gene_set = id_set_dict.get("ids")
 
     def to_dict(self):
         return {
             "name": self.name,
-            "ids":list(self.set),
+            "ids":self.gene_set,
             "network_id": self.network_id,
             "ndex": self.ndex,
             "e_set" : self.e_set
@@ -61,6 +72,15 @@ class IdentifierSet():
         print "m=" +str(M) + " n=" + str(self.n) + " q=" + str(query_id_set_n) + " k=" + str(overlap_n) + " pv=" + str(pv)
 
         return pv # EnrichmentScore(pv, k, overlap, self.name)
+
+
+class QueryIdentifierSet():
+    def __init__(self, id_set_dict):
+        self.set = set(id_set_dict.get("ids"))
+        self.n = len(self.set)
+
+
+
 
 # An instance of this class holds all the enrichment sets
 class EnrichmentData():
@@ -118,6 +138,18 @@ class EnrichmentData():
         else:
             print "unknown e_set " + e_set_name
 
+
+    def get_scores_on_stardarized_query_terms(self, e_set_name, standarized_query_terms, verbose=False):
+        e_set_name = e_set_name.lower()
+        if e_set_name in self.enrichment_set_map.keys():
+            e_set = self.enrichment_set_map.get(e_set_name)
+            if verbose:
+                print "using e_set " + e_set_name
+            return e_set.get_enrichment_scores_on_standardized_terms(standarized_query_terms, verbose)
+        else:
+            print "unknown e_set " + e_set_name
+
+
 # an enrichment set (e_set) is a named set of identifier sets (id_set)
 # a query is made by testing a query id_set vs. each id_set in the e_set
 class EnrichmentSet():
@@ -130,7 +162,7 @@ class EnrichmentSet():
     def load(self):
         if storage.e_set_exists(self.name):
             for f_name in storage.get_id_set_file_names(self.name):
-
+                print "Loading " + f_name
                 id_set_dict = storage.get_id_set_data(self.name, f_name)
                 id_set = IdentifierSet(id_set_dict)
                 self.add_id_set(id_set)
@@ -195,6 +227,37 @@ class EnrichmentSet():
         scores = sorted(scores, key=itemgetter('pv'))
         result = {"scores" : scores, "coverage" : coverage.to_dict()}
         return result
+
+
+    def get_enrichment_scores_on_standardized_terms(self, standarized_search_terms, verbose=False):
+        scores = []
+
+        matched_genes= standarized_search_terms['matched']
+        query_id_set_raw = QueryIdentifierSet({"ids": matched_genes.keys()})
+
+        coverage = Coverage(query_id_set_raw)
+        query_id_set = QueryIdentifierSet({"ids": (query_id_set_raw.set & self.objects)})
+        M = len(self.objects)
+        count = 0;
+        for set_id, id_set in self.id_set_map.iteritems():
+            overlap = query_id_set.set & id_set.set
+            k = len(overlap)
+            if k > 0 :
+                score = id_set.get_enrichment_score(query_id_set.n, M, k)
+                coverage.add_score(overlap)
+                overlap_table = {}
+                for symbol in overlap:
+                    gene_table = id_set.gene_set
+                    overlap_table[symbol] = gene_table[symbol]
+                scores.append( EnrichmentScore( score, k, overlap_table, id_set.name, set_id).to_dict())
+                count += 1
+
+        if verbose:
+            print "Processed " + str(count) + " id_sets, M = " + str(M)
+        scores = sorted(scores, key=itemgetter('pv'))
+        result = {"scores" : scores, "coverage" : coverage.to_dict(), "query": standarized_search_terms}
+        return result
+
 
 class Coverage():
 

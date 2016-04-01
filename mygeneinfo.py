@@ -40,5 +40,19 @@ def query_standard_to_gene(q, tax_id='9606'):
     return query_symbol(q, tax_id) or query_entrez_gene(q, tax_id) or query_uniprot(q, tax_id) or query_ensemble(q, tax_id)
 
 
+# returns a standardized gene symbol if found, otherwise returns None
+def query_term_to_gene(q, tax_id='9606'):
+    gene = query_symbol(q, tax_id) or query_entrez_gene(q, tax_id) or query_uniprot(q, tax_id) or query_ensemble(q, tax_id)
+    if gene :
+        return gene.symbol
+    else :
+        return None
+
+
+def get_gene_symbol(q, node_id, taxon_id = '9606'):
+    gene = query_standard_to_gene(q, taxon_id)
+    if gene :
+        return dm.GeneNodeRelation(gene.symbol,gene.id, node_id)
+    return False
 
 #print query_list(['symbol:brca1','symbol:brca2'])
