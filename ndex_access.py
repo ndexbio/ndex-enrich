@@ -42,7 +42,47 @@ class NdexAccess():
         return ids
 
     def get_genes_cx(self, network_id):
+        node_table = self.get_nodes_from_cx(network_id)
+
         self.reset_tables()
+
+        for node_id, node in node_table.items():
+            if "represents" in node:
+                represents_id = node["represents"]
+                if self.genes_from_term(represents_id, node_id):
+                    continue
+            # otherwise check aliases
+            if "aliases" in node:
+                alias_ids = node.get('aliases')
+                found_alias = False
+                for alias_id in alias_ids:
+                    if self.genes_from_term(alias_id,node_id):
+                        found_alias = True
+                        break
+                if found_alias:
+                    continue
+
+            # then, try using name
+            if "name" in node:
+                names = node.get("name")
+                foundGeneInName = False
+                for node_name in names :
+                    if self.gene_from_term(node_name,node_id):
+                        foundGeneInName = True
+                        break
+                if foundGeneInName :
+                    continue
+
+            if "functionTerm" in node:
+                self.genes_from_function_term(node["functionTerm"], node_id)
+
+        # turn the gene lists into a hash table
+        result = {}
+        for geneRelation in self.genes.values():
+            result[geneRelation.symbol] = list (geneRelation.nodes)
+        return result
+
+    def get_nodes_from_cx (self, network_id):
         response = self.ndex.get_network_as_cx_stream(network_id)
         cx_network = response.json()
         node_table = {}
@@ -97,42 +137,7 @@ class NdexAccess():
                         working_node = {}
                         node_table[node_id] = working_node
                     working_node["functionTerm"] = functionTerm
-
-        for node_id, node in node_table.items():
-            if "represents" in node:
-                represents_id = node["represents"]
-                if self.genes_from_term(represents_id, node_id):
-                    continue
-            # otherwise check aliases
-            if "aliases" in node:
-                alias_ids = node.get('aliases')
-                found_alias = False
-                for alias_id in alias_ids:
-                    if self.genes_from_term(alias_id,node_id):
-                        found_alias = True
-                        break
-                if found_alias:
-                    continue
-
-            # then, try using name
-            if "name" in node:
-                names = node.get("name")
-                foundGeneInName = False
-                for node_name in names :
-                    if self.gene_from_term(node_name,node_id):
-                        foundGeneInName = True
-                        break
-                if foundGeneInName :
-                    continue
-
-            if "functionTerm" in node:
-                self.genes_from_function_term(node["functionTerm"], node_id)
-
-        # turn the gene lists into a hash table
-        result = {}
-        for geneRelation in self.genes.values():
-            result[geneRelation.symbol] = list (geneRelation.nodes)
-        return result
+        return node_table
 
 
     def gene_from_term(self, term, node_id):

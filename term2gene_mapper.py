@@ -25,6 +25,23 @@ class Term2gene_mapper():
                 print term + " doesn't map to any gene"
             return gene
 
+
+    # a viaration of the funciton above. Returns the Gene object rather than a gene symbol
+    # returns None if term can't be mapped to a gene.
+    def gene_symbol_and_id_from_term(self, term):
+        gene = self.term_to_gene_map.get(term)
+        if gene:
+            return gene
+        else:
+            # look for term on external service
+            gene = mygeneinfo.query_standard_to_gene(term)
+            if gene:
+                self.term_to_gene_map[term] = gene
+                return gene
+            else :
+                print term + " doesn't map to any gene"
+                return None
+
     # returns a set of gene symbols found in the given function term
     def genes_from_function_term(self, function_term):
         # if it is a function term, process all genes mentioned

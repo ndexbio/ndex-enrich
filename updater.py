@@ -3,7 +3,6 @@ __author__ = 'dexter'
 import data_model as dm
 import ndex_access
 import fake_persistence as storage
-import gene_report
 
 def update(e_set_config, rebuild = False):
 
@@ -64,37 +63,5 @@ def update(e_set_config, rebuild = False):
 
         print "Saving e_set with " + str(len(e_set.get_id_set_names())) + " id_sets"
         e_set.save()
-
-
-# for each e_set in the configuration:
-#       for each network specified in the e_set:
-#           get the network from the specified NDEx
-#           analyze the identifiers in each network and normalize to genes using the mygeneinfo service
-#           add each gene-network pair to the report
-# output the report to a file in the gene_reports directory when all networks have been processed
-#  (the name of the file is <configuration name>_gene_report.txt
-
-def create_gene_report(config):
-    report = gene_report.GeneReport(config.name)
-    term_to_gene_map = {}
-    for e_set_config in config.e_set_configs:
-        process_e_set_for_report(e_set_config, report, term_to_gene_map)
-    return report
-
-def process_e_set_for_report(e_set_config, report, term_to_gene_map):
-    ndex = ndex_access.NdexAccess(e_set_config.ndex)
-    # Find the networks
-    networks = ndex.find_networks(e_set_config)
-    for network in networks:
-        process_network_for_report(network, e_set_config, report, ndex, term_to_gene_map)
-
-def process_network_for_report(network, e_set_config, report, ndex, term_to_gene_map):
-    network_id = network.get("externalId")
-    network_name = network.get("name")
-    print " - " + network_name + " : " + network_id
-    genes = ndex.get_genes(network_id, term_to_gene_map)
-    for gene in genes:
-        print "adding gene " + gene.symbol
-        report.add_gene_network_pair(gene.symbol, gene.id, network_id, network_name, e_set_config.name)
 
 
