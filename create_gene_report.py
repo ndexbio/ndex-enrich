@@ -68,7 +68,7 @@ class report_generator():
                 represents_id = node["represents"]
                 gene = self.term_mapper.gene_symbol_and_id_from_term(represents_id)
                 if gene != None :
-                    report.add_gene_network_pair(gene.symbol, gene.id, network_id, network_name, e_set_config.name)
+                    report.add_gene_network_pair(gene.id, gene.symbol,  network_id, network_name, e_set_config.name)
                     continue
             # otherwise check aliases
             if "aliases" in node:
@@ -77,7 +77,7 @@ class report_generator():
                 for alias_id in alias_ids:
                     gene = self.term_mapper.gene_symbol_and_id_from_term(alias_id)
                     if gene != None:
-                        report.add_gene_network_pair(gene.symbol, gene.id, network_id, network_name, e_set_config.name)
+                        report.add_gene_network_pair( gene.id, gene.symbol, network_id, network_name, e_set_config.name)
                         found_alias = True
                         break
                 if found_alias:
@@ -91,7 +91,7 @@ class report_generator():
                     if len(node_name) < 40:
                         gene = self.term_mapper.gene_symbol_and_id_from_term(node_name)
                         if gene != None:
-                            report.add_gene_network_pair(gene.symbol, gene.id, network_id, network_name, e_set_config.name)
+                            report.add_gene_network_pair(gene.id, gene.symbol, network_id, network_name, e_set_config.name)
                             foundGeneInName = True
                             break
                 if foundGeneInName :
@@ -107,7 +107,7 @@ class report_generator():
             if type(parameter) == 'str':
                 gene = self.term_mapper.gene_symbol_and_id_from_term(parameter)
                 if gene != None:
-                    report.add_gene_network_pair(gene.symbol, gene.id, network_id, network_name, e_set_name)
+                    report.add_gene_network_pair(gene.id, gene.symbol, network_id, network_name, e_set_name)
             else:
                 self.genes_from_function_term(parameter,network_id,network_name, e_set_name)
 

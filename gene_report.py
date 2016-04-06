@@ -14,7 +14,7 @@ class GeneReport():
         ]
 
     def add_gene_network_pair(self, gene_id, gene_symbol, network_id, network_name, e_set_name):
-        key = gene_id + "_" + network_id
+        key = str(gene_id) + "_" + network_id
         pair = self.gene_network_pairs.get(key)
         if not pair:
             pair = {
