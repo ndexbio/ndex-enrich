@@ -45,8 +45,9 @@ def update(e_set_config, rebuild = False):
 
         print "Updating " + str(len(networks_to_update.keys())) + " networks"
         # Do the updates
+        counter = 0
         for network_name, network_id in networks_to_update.iteritems():
-            print network_name + " : " + network_id
+            print network_name.encode('ascii','ignore') + " : " + network_id.encode('ascii','ignore')
             ids = na.get_genes_cx( network_id)
             id_set_dict = {
                 "name": network_name,
@@ -57,6 +58,7 @@ def update(e_set_config, rebuild = False):
             }
             id_set = dm.IdentifierSet(id_set_dict)
             e_set.add_id_set(id_set)
+            print counter + " networks indexed."
 
         # now that the updated e_set is ready to save, clear the old cached data
         storage.remove_all_id_sets(e_set_config.name)

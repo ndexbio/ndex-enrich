@@ -59,6 +59,11 @@ class EnableCors(object):
 
         return _enable_cors
 
+@route('/')
+def get_status():
+    version = '1.0.0'
+    status = {'status': 'available', 'version': version, 'service': 'enrich' }
+    return status
 
 @route('/hello/<name>',method=['OPTIONS','GET'])
 def index(name):
@@ -98,14 +103,21 @@ def run_query():
     verbose_mode = app.config.get("enrichment_verbose")
     e_data = app.config.get("enrichment_data")
     data = request.body
-    t = type(data)
-    s = str(data)
+   # t = type(data)
+   # s = str(data)
     dict = json.load(data)
     esetname = dict.get("eset")
     query_ids = dict.get('ids')
+    skip_normalization = dict.get('skip_query_normalization')
  #   query_id_set = dm.IdentifierSet({"ids": query_ids})
-    term_mapper = term2gene_mapper.Term2gene_mapper()
-    standardized_search_terms = term_mapper.standarize_terms(query_ids)
+    if skip_normalization:
+        matched_genes = {}
+        for term in query_ids:
+            matched_genes[term] = [term]
+        standardized_search_terms = {'matched': matched_genes, 'unmatched':[]}
+    else:
+        term_mapper = term2gene_mapper.Term2gene_mapper()
+        standardized_search_terms = term_mapper.standarize_terms(query_ids)
     result = e_data.get_scores_on_stardarized_query_terms(esetname, standardized_search_terms, verbose_mode)
     return result
 
