@@ -34,7 +34,7 @@ class Term2gene_mapper():
             return gene
         else:
             # look for term on external service
-            gene = mygeneinfo.query_standard_to_gene(term)
+            gene = mygeneinfo.query_standard_to_gene_quick(term)
             if gene:
                 self.term_to_gene_map[term] = gene
                 return gene

@@ -199,7 +199,7 @@ class NdexAccess():
     # assume species is human for now
     def gene_from_node_name(self, names):
         for name in names:
-            gene = mygeneinfo.query_standard_to_gene(name)
+            gene = mygeneinfo.query_standard_to_gene_quick(name)
             if gene:
                 self.term_to_gene_map[name] = gene
                 self.genes[gene.id] = gene.symbol
@@ -238,7 +238,7 @@ class NdexAccess():
                 return True
             else:
                 # look for term on external service
-                gene = mygeneinfo.query_standard_to_gene(base_term.name)
+                gene = mygeneinfo.query_standard_to_gene_quick(base_term.name)
                 if gene:
                     self.term_to_gene_map[base_term.name] = gene
                     self.genes[gene.id] = gene

@@ -110,7 +110,9 @@ def run_query():
     query_ids = dict.get('ids')
     skip_normalization = dict.get('skip_query_normalization')
  #   query_id_set = dm.IdentifierSet({"ids": query_ids})
-    if skip_normalization:
+#    if skip_normalization == None:
+#        skip_normalization = True
+    if skip_normalization == None or skip_normalization:
         matched_genes = {}
         for term in query_ids:
             matched_genes[term] = [term]

@@ -58,7 +58,8 @@ def update(e_set_config, rebuild = False):
             }
             id_set = dm.IdentifierSet(id_set_dict)
             e_set.add_id_set(id_set)
-            print counter + " networks indexed."
+            counter +=1
+            print str(counter) + " networks indexed."
 
         # now that the updated e_set is ready to save, clear the old cached data
         storage.remove_all_id_sets(e_set_config.name)

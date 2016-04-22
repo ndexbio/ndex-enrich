@@ -26,7 +26,10 @@ def query_entrez_gene(q, tax_id='9606'):
     return query_to_gene("entrezgene:" + q, tax_id)
 
 def query_ensemble(q, tax_id='9606'):
-    return query_to_gene("ensemble:" + q, tax_id)
+    return query_to_gene("ensemblgene:" + q, tax_id)
+
+def query_alias(q, tax_id='9606'):
+    return query_to_gene("alias:" + q, tax_id)
 
 def query_to_gene(q, tax_id='9606'):
     hits = query(q, tax_id).get("hits")
@@ -36,13 +39,28 @@ def query_to_gene(q, tax_id='9606'):
         return gene
     return False
 
+def query_to_gene_all(q, tax_id='9606'):
+    r = requests.get('http://mygene.info/v2/query?q='+q+'&fields=symbol%2Centrezgene%2Censemblgene%2Cuniprot%2Calias&species='+tax_id+'&entrezonly=true')
+    result = r.json()
+    hits = result.get("hits")
+    if hits and len(hits) > 0:
+        hit = hits[0]
+        gene = dm.Gene(hit.get('symbol'), hit.get('entrezgene'))
+        return gene
+    return False
+
+
 def query_standard_to_gene(q, tax_id='9606'):
-    return query_symbol(q, tax_id) or query_entrez_gene(q, tax_id) or query_uniprot(q, tax_id) or query_ensemble(q, tax_id)
+    return query_symbol(q, tax_id) or query_entrez_gene(q, tax_id) or query_uniprot(q, tax_id) or query_ensemble(q, tax_id) or query_alias(q,tax_id)
+
+def query_standard_to_gene_quick(q, tax_id='9606'):
+    return query_to_gene_all(q,tax_id)
 
 
 # returns a standardized gene symbol if found, otherwise returns None
 def query_term_to_gene(q, tax_id='9606'):
-    gene = query_symbol(q, tax_id) or query_entrez_gene(q, tax_id) or query_uniprot(q, tax_id) or query_ensemble(q, tax_id)
+    gene = query_to_gene_all(q,tax_id)
+    #query_symbol(q, tax_id) or query_entrez_gene(q, tax_id) or query_uniprot(q, tax_id) or query_ensemble(q, tax_id) or query_alias(q,tax_id)
     if gene :
         return gene.symbol
     else :
@@ -50,7 +68,8 @@ def query_term_to_gene(q, tax_id='9606'):
 
 
 def get_gene_symbol(q, node_id, taxon_id = '9606'):
-    gene = query_standard_to_gene(q, taxon_id)
+    gene = query_standard_to_gene_quick(q, taxon_id)
+      #  query_standard_to_gene(q, taxon_id)
     if gene :
         return dm.GeneNodeRelation(gene.symbol,gene.id, node_id)
     return False
