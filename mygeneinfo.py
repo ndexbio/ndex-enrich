@@ -9,9 +9,9 @@ def query_list(queries, tax_id='9606'):
 
 def query(q, tax_id='9606', entrezonly=True):
     if entrezonly:
-        r = requests.get('http://mygene.info/v2/query?q='+q+'&species='+tax_id+'&entrezonly=true')
+        r = requests.get('http://mygene.info/v3/query?q='+q+'&species='+tax_id+'&entrezonly=true')
     else:
-        r = requests.get('http://mygene.info/v2/query?q='+q+'&species='+tax_id)
+        r = requests.get('http://mygene.info/v3/query?q='+q+'&species='+tax_id)
     result = r.json()
     result['query'] = q
     return result
@@ -40,12 +40,15 @@ def query_to_gene(q, tax_id='9606'):
     return False
 
 def query_to_gene_all(q, tax_id='9606'):
-    r = requests.get('http://mygene.info/v2/query?q='+q+'&fields=symbol%2Centrezgene%2Censemblgene%2Cuniprot%2Calias&species='+tax_id+'&entrezonly=true')
+    #r = requests.get('http://mygene.info/v3/query?q='+q+'&fields=symbol%2Centrezgene%2Censemblgene%2Cuniprot%2Calias&species='+tax_id+'&entrezonly=true')
+    r = requests.get('http://mygene.info/v3/query?q='+q+'&species='+tax_id)
+    r.raise_for_status()
     result = r.json()
     hits = result.get("hits")
     if hits and len(hits) > 0:
         hit = hits[0]
         gene = dm.Gene(hit.get('symbol'), hit.get('entrezgene'))
+        print gene.symbol
         return gene
     return False
 

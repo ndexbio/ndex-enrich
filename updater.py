@@ -15,7 +15,7 @@ def update(e_set_config, rebuild = False):
         storage.ensure_e_set_dir(e_set_config.name)
         e_set.load()
 
-        na = ndex_access.NdexAccess(e_set_config.ndex)
+        na = ndex_access.NdexAccess(e_set_config.ndex, e_set_config.account, e_set_config.password)
 
         # Find the candidate networks
         networks = na.find_networks(e_set_config)

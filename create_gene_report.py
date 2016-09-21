@@ -50,9 +50,10 @@ class report_generator():
         return report
 
     def process_e_set_for_report(self,e_set_config, report, term_to_gene_map):
-        ndex = ndex_access.NdexAccess(e_set_config.ndex)
+        ndex = ndex_access.NdexAccess(e_set_config.ndex, username=e_set_config.username, password=e_set_config.password)
         # Find the networks
         networks = ndex.find_networks(e_set_config)
+        print "Found " + str(len(networks)) + " networks for gene report"
         for network in networks:
             self.process_network_for_report(network, e_set_config, report, ndex, term_to_gene_map)
 

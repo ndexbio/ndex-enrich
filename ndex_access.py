@@ -4,8 +4,8 @@ import ndex.client as nc
 import mygeneinfo
 
 class NdexAccess():
-    def __init__(self, host):
-        self.ndex = nc.Ndex(host)
+    def __init__(self, host, username=None, password=None):
+        self.ndex = nc.Ndex(host, username=username, password=password)
         self.ndex.set_debug_mode(True)
         self.node_map = {}
         self.base_term_map = {}
