@@ -66,3 +66,13 @@ target/
 e_sets/*
 gene_reports/*
 .idea/workspace.xml
+
+.DS_Store
+
+.idea/encodings.xml
+
+.idea/misc.xml
+
+.idea/ndex-enrich.iml
+
+*.iml
