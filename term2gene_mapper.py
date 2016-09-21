@@ -1,5 +1,6 @@
 
 import mygeneinfo
+import data_model as dm
 
 class Term2gene_mapper():
     def __init__(self):
@@ -8,6 +9,22 @@ class Term2gene_mapper():
 
     def reset(self):
         self.term_to_gene_map = {}
+
+    def add_network_nodes(self, node_table):
+        query_string =""
+        for node_id, node in node_table.items():
+            query_string = query_string + " " + list(node.get('name'))[0]
+        gene_list = mygeneinfo.query_batch(query_string)
+        for hit in gene_list:
+            term = hit.get('query')
+            symbol = hit.get('symbol')
+            id = hit.get('entrezgene')
+            if symbol and id:
+                gene = dm.Gene(hit.get('symbol'), hit.get('entrezgene'))
+                self.term_to_gene_map[term] = gene
+            else:
+                print "no symbol and id for " + term
+        return gene_list
 
     # standardize a term to a gene symbol
     # input: search term as a single string
@@ -26,7 +43,7 @@ class Term2gene_mapper():
             return gene
 
 
-    # a viaration of the funciton above. Returns the Gene object rather than a gene symbol
+    # a variation of the function above. Returns the Gene object rather than a gene symbol
     # returns None if term can't be mapped to a gene.
     def gene_symbol_and_id_from_term(self, term):
         gene = self.term_to_gene_map.get(term)

@@ -106,12 +106,32 @@ def ensure_gene_report_dir():
         makedirs(path)
     return path
 
-def save_gene_report(report):
-    path = gene_report_file_path(report.name)
-    with open(path, 'w') as csvfile:
-        fieldnames = report.fields
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', dialect='excel-tab')
-        writer.writeheader()
-        for row in report.get_rows():
-            writer.writerow(row)
+def gene_list_file_path(name):
+    gene_list_dir = ensure_gene_list_dir()
+    return join(gene_list_dir, name + ".txt")
+
+def ensure_gene_list_dir():
+    current_directory = dirname(abspath(__file__))
+    path = join(current_directory, "gene_lists")
+    if not isdir(path):
+        print "Creating " + str(path)
+        makedirs(path)
+    return path
+
+def save_gene_report(report, mode):
+    if mode is 'tabular':
+        path = gene_report_file_path(report.name)
+        with open(path, 'w') as csvfile:
+            fieldnames = report.fields
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', dialect='excel-tab')
+            writer.writeheader()
+            for row in report.get_rows():
+                writer.writerow(row)
+    if mode is 'json':
+        path = gene_list_file_path(report.name)
+        with open(path, 'w') as file:
+            file.write(json.dumps(report.get_network_summary(), indent=4))
+
+
+
 

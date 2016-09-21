@@ -1,11 +1,19 @@
 import requests
 import data_model as dm
 
-def query_list(queries, tax_id='9606'):
+def query_list(queries, tax_id='9606', fields='sym'):
     results = []
     for q in queries:
         results.append(query(q, tax_id))
     return results
+
+def query_batch(query_string, tax_id='9606', scopes="symbol, entrezgene", fields="symbol, entrezgene"):
+    data = {'species': tax_id,
+            'scopes': scopes,
+            'fields': fields,
+            'q': query_string}
+    r = requests.post('http://mygene.info/v3/query', data)
+    return r.json()
 
 def query(q, tax_id='9606', entrezonly=True):
     if entrezonly:
