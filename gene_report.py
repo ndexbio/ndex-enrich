@@ -2,6 +2,7 @@ __author__ = 'dexter'
 
 import ndex_access
 import term2gene_mapper
+import json
 
 class GeneReport():
     def __init__(self, name):
@@ -95,49 +96,62 @@ class report_generator():
         node_table = ndex.get_nodes_from_cx(network_id)
         self.term_mapper.add_network_nodes(node_table)
 
+        all_found = []
+        all_not_found = []
         for node_id, node in node_table.items():
+            found = False
             if "represents" in node:
                 represents_id = node["represents"]
-                gene = self.term_mapper.gene_symbol_and_id_from_term(represents_id)
+                gene = self.term_mapper.get_gene_from_identifier(represents_id)
                 if gene != None:
                     report.add_gene_network_pair(gene.id, gene.symbol, network_id, network_name, e_set_config.name)
+                    found = True
+                    all_found.append({"node_id": node_id, "symbol": gene.symbol, "gene_id":gene.id, "input":represents_id, "type":"represents"})
                     continue
             # otherwise check aliases
-            if "aliases" in node:
-                alias_ids = node.get('aliases')
-                found_alias = False
+            if "alias" in node:
+                alias_ids = node.get('alias')
                 for alias_id in alias_ids:
-                    gene = self.term_mapper.gene_symbol_and_id_from_term(alias_id)
+                    gene = self.term_mapper.get_gene_from_identifier(alias_id)
                     if gene != None:
                         report.add_gene_network_pair(gene.id, gene.symbol, network_id, network_name, e_set_config.name)
-                        found_alias = True
+                        found = True
+                        all_found.append({"node_id": node_id, "symbol": gene.symbol, "gene_id":gene.id, "input":alias_id, "type":"alias"})
                         break
-                if found_alias:
+                if found:
                     continue
 
             # then, try using name
             if "name" in node:
                 names = node.get("name")
-                foundGeneInName = False
                 for node_name in names:
                     if len(node_name) < 40:
-                        gene = self.term_mapper.gene_symbol_and_id_from_term(node_name)
+                        gene = self.term_mapper.get_gene_from_identifier(node_name)
                         if gene != None:
                             report.add_gene_network_pair(gene.id, gene.symbol, network_id, network_name, e_set_config.name)
-                            foundGeneInName = True
+                            found = True
+                            all_found.append({"node_id": node_id, "symbol": gene.symbol, "gene_id":gene.id, "input":node_name, "type":"name"})
                             break
-                if foundGeneInName:
+                if found:
                     continue
 
             if "functionTerm" in node:
-                self.genes_from_function_term(node["functionTerm"], network_id, network_name, e_set_config.name, report)
+                genes = self.genes_from_function_term(node["functionTerm"], network_id, network_name, e_set_config.name, report, all_found, node_id)
 
-    def genes_from_function_term(self, function_term, network_id, network_name, e_set_name, report):
+            if not found:
+                all_not_found.append({"node_id":node_id, "names": list(node.get("name"))})
+
+        print "Found genes for " + str(len(all_found)) + " nodes"
+        print "Did not find genes for " + str(len(all_not_found)) + " nodes"
+        print json.dumps(all_not_found, indent=4)
+
+    def genes_from_function_term(self, function_term, network_id, network_name, e_set_name, report, all_found, node_id):
         # if it is a function term, process all genes mentioned
         for parameter in function_term['args']:
             if type(parameter) == 'str':
-                gene = self.term_mapper.gene_symbol_and_id_from_term(parameter)
+                gene = self.term_mapper.get_gene_from_identifier(parameter)
                 if gene != None:
                     report.add_gene_network_pair(gene.id, gene.symbol, network_id, network_name, e_set_name)
+                    all_found.append({"node_id": node_id, "symbol": gene.symbol, "gene_id":gene.id, "input":parameter, "type":"function_term"})
             else:
-                self.genes_from_function_term(parameter, network_id, network_name, e_set_name, report)
+                self.genes_from_function_term(parameter, network_id, network_name, e_set_name, report, all_found, node_id)
