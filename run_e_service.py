@@ -120,7 +120,7 @@ def run_query():
     else:
         term_mapper = term2gene_mapper.Term2gene_mapper()
         standardized_search_terms = term_mapper.standarize_terms(query_ids)
-    result = e_data.get_scores_on_stardarized_query_terms(esetname, standardized_search_terms, verbose_mode)
+    result = e_data.get_scores_on_standarized_query_terms(esetname, standardized_search_terms, verbose_mode)
     return result
 
 app.install(EnableCors())

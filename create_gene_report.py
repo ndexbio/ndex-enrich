@@ -20,13 +20,12 @@ __author__ = 'dexter'
 # body
 
 import argparse
-import updater
 import configuration as conf
 import sys
 import fake_persistence as storage
 import gene_report
 
-parser = argparse.ArgumentParser(description='update an e_set')
+parser = argparse.ArgumentParser(description='create a gene report')
 
 parser.add_argument('config', action='store')
 parser.add_argument('--mode', dest='mode', action='store_const', default='json',
@@ -43,7 +42,7 @@ config = conf.EServiceConfiguration()
 config.load(arg.config, test_mode=arg.test)
 
 if len(config.e_set_configs) is 0:
-    print "No enrichment sets are specified in the configuration"
+    print "No id sets are specified in the configuration"
     sys.exit()
 
 reporter = gene_report.report_generator()

@@ -11,6 +11,7 @@ class Gene():
         self.symbol = symbol
         self.id = entrez_gene_id
 
+
 class GeneNodeRelation():
     def __init__(self, symbol, entrez_gene_id, node_id):
         self.symbol = symbol
@@ -39,14 +40,14 @@ class EnrichmentScore():
             "pv" : self.pv,
             "overlap" : self.overlap,
             "set_name" : self.set_name,
-            "set_id" : self.set_id
-        }
+            "set_id" : self.set_id}
+
 
 class IdentifierSet():
     def __init__(self, id_set_dict):
         self.name = id_set_dict.get("name")
         self.network_id = id_set_dict.get("network_id")
-        self.set = set(id_set_dict.get("ids").keys())
+        self.set = set(id_set_dict.get("ids"))
         self.ndex = id_set_dict.get("ndex")
         self.e_set = id_set_dict.get("e_set")
         self.n = len(self.set)
@@ -80,8 +81,6 @@ class QueryIdentifierSet():
         self.n = len(self.set)
 
 
-
-
 # An instance of this class holds all the enrichment sets
 class EnrichmentData():
     def __init__(self, dir_name):
@@ -95,6 +94,12 @@ class EnrichmentData():
             if isdir(path):
                 e_set = self.add_e_set(f_name)
                 e_set.load()
+
+    def load_one_eset(self, eset_dir_name):
+        path = join(self.dir_name, eset_dir_name)
+        if isdir(path):
+            e_set = self.add_e_set(eset_dir_name)
+            e_set.load()
 
     def get_e_set_names(self):
         return self.enrichment_set_map.keys()
@@ -118,6 +123,7 @@ class EnrichmentData():
         e_set_name = e_set_name.lower()
         e_set = EnrichmentSet(e_set_name)
         self.enrichment_set_map[e_set_name] = e_set
+        print "adding enrichment set: " + e_set_name
         return e_set
 
     def add_id_set(self, e_set_name, id_set_name, id_list):
@@ -138,8 +144,7 @@ class EnrichmentData():
         else:
             print "unknown e_set " + e_set_name
 
-
-    def get_scores_on_stardarized_query_terms(self, e_set_name, standarized_query_terms, verbose=False):
+    def get_scores_on_standarized_query_terms(self, e_set_name, standarized_query_terms, verbose=False):
         e_set_name = e_set_name.lower()
         if e_set_name in self.enrichment_set_map.keys():
             e_set = self.enrichment_set_map.get(e_set_name)
@@ -212,7 +217,7 @@ class EnrichmentSet():
         coverage = Coverage(query_id_set_raw)
         query_id_set = IdentifierSet({"ids": (query_id_set_raw.set & self.objects)})
         M = len(self.objects)
-        count = 0;
+        count = 0
         for set_id, id_set in self.id_set_map.iteritems():
             overlap = query_id_set.set & id_set.set
             k = len(overlap)
