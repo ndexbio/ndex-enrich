@@ -277,6 +277,9 @@ class NdexAccess():
         else:
             print "Unknown id_set config type: " + id_set_config.type
             return result
+        if('networks' in result):
+            result = result.get('networks')
+
         result = self.filter_source_format(result, id_set_config)
         return result
 
@@ -286,9 +289,18 @@ class NdexAccess():
         filtered = []
         filter_format = id_set_config.source_format.upper()
         for network_summary in network_summaries:
-            source_format = self.getNetworkProperty(network_summary, "sourceFormat")
+            source_format = self.getNetworkProperty(network_summary, "ndex:sourceFormat")
+
+            if(not source_format):
+                source_format = self.getNetworkProperty(network_summary, "sourceFormat")
+
             if source_format and filter_format == source_format.upper():
                 filtered.append(network_summary)
+            elif(filter_format == 'UNKNOWN' and not source_format):
+                filtered.append(network_summary)
+            else:
+
+
         return filtered
 
     def getNetworkProperty(self, network, name):
