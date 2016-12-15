@@ -52,8 +52,8 @@ class NdexAccess():
                 if self.gene_from_term(represents_id, node_id):
                     continue
             # otherwise check aliases
-            if "aliases" in node:
-                alias_ids = node.get('aliases')
+            if "alias" in node:
+                alias_ids = node.get('alias')
                 found_alias = False
                 for alias_id in alias_ids:
                     if self.gene_from_term(alias_id,node_id):
@@ -131,13 +131,13 @@ class NdexAccess():
                             node_table[node_id] = working_node
                             node_alias_set = set()
                             node_alias_set.union(set(alias_list))
-                            working_node["aliases"] = node_alias_set
+                            working_node["alias"] = node_alias_set
                             node_table[node_id] = working_node
                         else:
                             working_node = node_table[node_id]
-                            node_alias_set = working_node["aliases"]
+                            node_alias_set = working_node["alias"]
                             node_alias_set.union(set(alias_list))
-                            working_node["aliases"] = node_alias_set
+                            working_node["alias"] = node_alias_set
 
             elif "functionTerms" in fragment:
                 raise ValueError("not handling function terms in this version")
@@ -176,35 +176,7 @@ class NdexAccess():
             else:
                 self.genes_from_function_term(parameter,node_id)
 
-    #The following functions are deprecated
 
-    # def get_genes(self, network_id, term_to_gene_map):
-    #     network = self.ndex.get_complete_network(network_id)
-    #     self.node_map = network.get("nodes")
-    #     self.base_term_map = network.get("baseTerms")
-    #     self.function_term_map = network.get("functionTerms")
-    #     self.term_to_gene_map = term_to_gene_map
-    #     self.genes = {}
-    #     for node in self.node_map.values():
-    #         # first check to see if we can get a gene from "represents"
-    #         represents_id = node.get('represents')
-    #         if represents_id and self.genes_from_term_id(represents_id):
-    #             break
-    #         # otherwise check aliases
-    #         alias_ids = node.get('aliases')
-    #         found_alias = False
-    #         for alias_id in alias_ids:
-    #             if self.genes_from_term_id(alias_id):
-    #                 found_alias = True
-    #                 break
-    #         if found_alias:
-    #             break
-    #         # finally, try using name
-    #         name = node.get("name")
-    #         if name:
-    #             self.gene_from_node_name(name)
-    #
-    #     return self.genes.values()
 
     # try using the name to find a gene
     # assume species is human for now
