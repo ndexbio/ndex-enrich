@@ -71,10 +71,13 @@ def get_id_set_data(e_set_name, id_set_file_name):
     name = splitext(base)[0]
     e_set_dir = e_set_dir_name(e_set_name)
     filename = join(e_set_dir, name + ".json")
-    file = open(filename, "r")
-    data = json.load(file)
-    file.close()
-    return data
+    if(isfile(filename)):
+        file = open(filename, "r")
+        data = json.load(file)
+        file.close()
+        return data
+    else:
+        return None
 
 def save_id_set_dict(e_set_name, id_set_id, id_set_dict):
     e_set_dir = ensure_e_set_dir(e_set_name)

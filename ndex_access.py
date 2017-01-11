@@ -82,7 +82,7 @@ class NdexAccess():
             result[geneRelation.symbol] = list (geneRelation.nodes)
         return result
 
-    def get_nodes_from_cx (self, network_id):
+    def get_nodes_from_cx(self, network_id, node_att_prefix="name"):
         response = self.ndex.get_network_as_cx_stream(network_id)
         cx_network = response.json()
         node_table = {}
@@ -130,13 +130,13 @@ class NdexAccess():
                             working_node = {}
                             node_table[node_id] = working_node
                             node_alias_set = set()
-                            node_alias_set.union(set(alias_list))
+                            node_alias_set = node_alias_set.union(set(alias_list))
                             working_node["alias"] = node_alias_set
                             node_table[node_id] = working_node
                         else:
                             working_node = node_table[node_id]
-                            node_alias_set = working_node["alias"]
-                            node_alias_set.union(set(alias_list))
+                            node_alias_set = working_node["name"]
+                            node_alias_set = node_alias_set.union(set(alias_list))
                             working_node["alias"] = node_alias_set
 
             elif "functionTerms" in fragment:
@@ -270,8 +270,6 @@ class NdexAccess():
                 filtered.append(network_summary)
             elif(filter_format == 'UNKNOWN' and not source_format):
                 filtered.append(network_summary)
-            else:
-
 
         return filtered
 
