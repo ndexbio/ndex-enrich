@@ -1,0 +1,16 @@
+{
+  "e_sets":[
+    {
+      "name": "nci_with_gene_names_2",
+      "ndex": "http://public.ndexbio.org",
+      "type": "QUERY",
+      "account_name": "cravat",
+      "username": "cravat",
+      "password": "cravat",
+      "query_limit": 300,
+      "query_string": "*",
+      "id_prefix": "name"
+
+    }
+  ]
+}

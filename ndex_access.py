@@ -4,8 +4,8 @@ import ndex.client as nc
 import mygeneinfo
 
 class NdexAccess():
-    def __init__(self, host):
-        self.ndex = nc.Ndex(host)
+    def __init__(self, host, username=None, password=None):
+        self.ndex = nc.Ndex(host, username=username, password=password)
         self.ndex.set_debug_mode(True)
         self.node_map = {}
         self.base_term_map = {}
@@ -20,26 +20,26 @@ class NdexAccess():
         self.term_to_gene_map = {}
         self.genes = {}
 
-    def get_ids(self, prefix, network_id):
-        network = self.ndex.get_complete_network(network_id)
-        ids = []
-        if prefix == "name":
-            for node in network.get("nodes").values():
-                if node.get("name"):
-                    ids.append(node.get("name"))
-
-        else:
-            for term in network.get("baseTerms").values():
-                name = term.get("name")
-                components = name.split(":")
-                id = False
-                term_prefix = False
-                if len(components) > 1:
-                    term_prefix = components[0]
-                    id = components[1]
-                if id and term_prefix and term_prefix == prefix:
-                    ids.append(id)
-        return ids
+    # def get_ids(self, prefix, network_id):
+    #     network = self.ndex.get_complete_network(network_id)
+    #     ids = []
+    #     if prefix == "name":
+    #         for node in network.get("nodes").values():
+    #             if node.get("name"):
+    #                 ids.append(node.get("name"))
+    #
+    #     else:
+    #         for term in network.get("baseTerms").values():
+    #             name = term.get("name")
+    #             components = name.split(":")
+    #             id = False
+    #             term_prefix = False
+    #             if len(components) > 1:
+    #                 term_prefix = components[0]
+    #                 id = components[1]
+    #             if id and term_prefix and term_prefix == prefix:
+    #                 ids.append(id)
+    #     return ids
 
     def get_genes_cx(self, network_id):
         node_table = self.get_nodes_from_cx(network_id)
@@ -49,14 +49,14 @@ class NdexAccess():
         for node_id, node in node_table.items():
             if "represents" in node:
                 represents_id = node["represents"]
-                if self.genes_from_term(represents_id, node_id):
+                if self.gene_from_term(represents_id, node_id):
                     continue
             # otherwise check aliases
-            if "aliases" in node:
-                alias_ids = node.get('aliases')
+            if "alias" in node:
+                alias_ids = node.get('alias')
                 found_alias = False
                 for alias_id in alias_ids:
-                    if self.genes_from_term(alias_id,node_id):
+                    if self.gene_from_term(alias_id,node_id):
                         found_alias = True
                         break
                 if found_alias:
@@ -82,7 +82,7 @@ class NdexAccess():
             result[geneRelation.symbol] = list (geneRelation.nodes)
         return result
 
-    def get_nodes_from_cx (self, network_id):
+    def get_nodes_from_cx(self, network_id, node_att_prefix="name"):
         response = self.ndex.get_network_as_cx_stream(network_id)
         cx_network = response.json()
         node_table = {}
@@ -98,47 +98,58 @@ class NdexAccess():
                         if "name" in working_node :
                             working_node["name"] =  working_node["name"].add(node["n"])
                         else:
-                            working_node["name"] = set([node["n"]])
+                            node_name_set = set()
+                            node_name_set.add(node["n"])
+                            working_node["name"] = node_name_set
                     if "r" in node:
                         working_node["represents"] = node["r"]
+
             elif "nodeAttributes" in fragment:
                 for attr in fragment ["nodeAttributes"]:
                     if attr["n"] == "name":
                         node_id = attr["po"]
                         node_name = attr["v"]
-                        working_node = node_table[node_id]
-                        if not working_node:
+
+                        if node_id not in node_table:
                             working_node = {}
                             node_table[node_id] = working_node
-                        if "name" in working_node:
+                            node_name_set = set()
+                            node_name_set.add(node_name)
+                            working_node["name"] = node_name_set
+                            node_table[node_id] = working_node
+                        else:
+                            working_node = node_table[node_id]
                             names = working_node["name"]
                             names.add(node_name)
                             working_node["name"] = names
-                        else:
-                            working_node["name"] = set([node_name])
+
                     elif attr["n"] == "alias":
                         node_id = attr["po"]
                         alias_list = attr["v"]
-                        working_node = node_table[node_id]
-                        if not working_node:
+                        if node_id not in node_table:
                             working_node = {}
                             node_table[node_id] = working_node
-                        if "alias" in working_node:
-                            names = working_node["alias"]
-                            names.union(set(alias_list))
-                            working_node["alias"] = names
+                            node_alias_set = set()
+                            node_alias_set = node_alias_set.union(set(alias_list))
+                            working_node["alias"] = node_alias_set
+                            node_table[node_id] = working_node
                         else:
-                            working_node["alias"] = set(alias_list)
-            elif "functionTerms" in fragment:
-                for functionTerm in fragment ["functionTerms"]:
-                    node_id = functionTerm["po"]
-                    working_node = node_table[node_id]
-                    if not working_node:
-                        working_node = {}
-                        node_table[node_id] = working_node
-                    working_node["functionTerm"] = functionTerm
-        return node_table
+                            working_node = node_table[node_id]
+                            node_alias_set = working_node["name"]
+                            node_alias_set = node_alias_set.union(set(alias_list))
+                            working_node["alias"] = node_alias_set
 
+            elif "functionTerms" in fragment:
+                raise ValueError("not handling function terms in this version")
+                # for functionTerm in fragment ["functionTerms"]:
+                #     node_id = functionTerm["po"]
+                #     working_node = node_table[node_id]
+                #     if not working_node:
+                #         working_node = {}
+                #         node_table[node_id] = working_node
+                #     working_node["functionTerm"] = functionTerm
+
+        return node_table
 
     def gene_from_term(self, term, node_id):
         gene_relation = self.term_to_gene_map.get(term)
@@ -153,7 +164,7 @@ class NdexAccess():
                 self.term_to_gene_map[term] = gene_relation
                 self.genes[gene_relation.id] = gene_relation
                 return True
-            else :
+            else:
                 print term + " doesn't map to any gene"
         return False
 
@@ -165,35 +176,7 @@ class NdexAccess():
             else:
                 self.genes_from_function_term(parameter,node_id)
 
-    #The following functions are deprecated
 
-    def get_genes(self, network_id, term_to_gene_map):
-        network = self.ndex.get_complete_network(network_id)
-        self.node_map = network.get("nodes")
-        self.base_term_map = network.get("baseTerms")
-        self.function_term_map = network.get("functionTerms")
-        self.term_to_gene_map = term_to_gene_map
-        self.genes = {}
-        for node in self.node_map.values():
-            # first check to see if we can get a gene from "represents"
-            represents_id = node.get('represents')
-            if represents_id and self.genes_from_term_id(represents_id):
-                break
-            # otherwise check aliases
-            alias_ids = node.get('aliases')
-            found_alias = False
-            for alias_id in alias_ids:
-                if self.genes_from_term_id(alias_id):
-                    found_alias = True
-                    break
-            if found_alias:
-                break
-            # finally, try using name
-            name = node.get("name")
-            if name:
-                self.gene_from_node_name(name)
-
-        return self.genes.values()
 
     # try using the name to find a gene
     # assume species is human for now
@@ -208,13 +191,11 @@ class NdexAccess():
                 print name + " not found in mygene.info"
         return False
 
-
-
     def genes_from_term_id(self, term_id):
         if self.gene_from_base_term_id(term_id):
             return True
-        elif self.genes_from_function_term_id(term_id):
-            return True
+        # elif self.genes_from_function_term_id(term_id):
+        #     return True
         else:
             return False
 
@@ -226,8 +207,6 @@ class NdexAccess():
                 self.genes_from_term_id(parameter)
             return True
         return False
-
-
 
     def gene_from_base_term_id(self, base_term_id):
         base_term = self.base_term_map.get(base_term_id)
@@ -245,25 +224,34 @@ class NdexAccess():
                     return True
         return False
 
-
-
-
     def find_networks(self, id_set_config):
         result = []
+        print "ID set type %s " % (id_set_config.type)
         if id_set_config.type == "QUERY":
             result = self.ndex.search_networks(
                 id_set_config.query_string,
                 id_set_config.account_name,
-                block_size=id_set_config.query_limit)
-        elif id_set_config.type == "IDLIST":
-            networks = []
-            for network_id in id_set_config.id_list:
+                size=id_set_config.query_limit)
+            print "%s network ids from id_list" % (len(id_set_config.id_list))
+        elif id_set_config.type in ["IDLIST", "IDMAP"]:
+
+            if id_set_config.type == "IDLIST":
+                print "%s network ids from id_list" % (len(id_set_config.id_list))
+                id_list = id_set_config.id_list
+            else:
+                print "%s network ids from id_map" % (len(id_set_config.id_map))
+                id_list = id_set_config.id_map.values()
+
+            for network_id in id_list:
                 network_summary = self.ndex.get_network_summary(network_id)
                 if network_summary:
                     result.append(network_summary)
         else:
             print "Unknown id_set config type: " + id_set_config.type
             return result
+        if('networks' in result):
+            result = result.get('networks')
+
         result = self.filter_source_format(result, id_set_config)
         return result
 
@@ -273,9 +261,16 @@ class NdexAccess():
         filtered = []
         filter_format = id_set_config.source_format.upper()
         for network_summary in network_summaries:
-            source_format = self.getNetworkProperty(network_summary, "sourceFormat")
+            source_format = self.getNetworkProperty(network_summary, "ndex:sourceFormat")
+
+            if(not source_format):
+                source_format = self.getNetworkProperty(network_summary, "sourceFormat")
+
             if source_format and filter_format == source_format.upper():
                 filtered.append(network_summary)
+            elif(filter_format == 'UNKNOWN' and not source_format):
+                filtered.append(network_summary)
+
         return filtered
 
     def getNetworkProperty(self, network, name):
@@ -288,7 +283,7 @@ class NdexAccess():
         return False
 
     def get_account_network_ids(self, ndex_e_set_account_name, max=100):
-        network_summary_list = self.ndex.find_networks("", ndex_e_set_account_name, block_size=max)
+        network_summary_list = self.ndex.find_networks("", ndex_e_set_account_name, size=max)
         ids = []
         for ns in network_summary_list:
             id = ns.get("externalId")

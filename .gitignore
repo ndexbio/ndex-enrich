@@ -57,12 +57,17 @@ docs/_build/
 target/
 
 #PyCharm
-.idea/workspace.xml
+.DS_Store
+
 .idea
-.idea/*
-/.idea/workspace.xml
 
 
-e_sets/*
-gene_reports/*
-.idea/workspace.xml
+# NDEx Enrich
+e_sets/
+gene_lists/
+gene_reports/
+
+
+
+
+

@@ -32,6 +32,7 @@ class EServiceConfiguration():
                 self.e_set_configs.append(config_object)
                 print "loaded e_set configuration: " + str(config_object.name)
 
+
 class ESetConfiguration():
     def __init__(self, config):
         self.name = config.get('name')
@@ -45,4 +46,5 @@ class ESetConfiguration():
         self.query_limit = config.get('query_limit') if config.get('query_limit') else 100
         self.id_prefix = config.get('id_prefix') if config.get('id_prefix') else "HGNC Symbol"
         self.source_format = config.get('source_format')
+        self.id_map = config.get('id_map') if config.get('id_map') else {}
 
