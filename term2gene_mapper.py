@@ -86,7 +86,7 @@ class Term2gene_mapper():
 
     # a variation of the function above. Returns the Gene object rather than a gene symbol
     # returns None if term can't be mapped to a gene.
-    def gene_symbol_and_id_from_term(self, term):
+    def  gene_symbol_and_id_from_term(self, term):
         gene = self.term_to_gene_map.get(term)
         if gene:
             return gene
