@@ -22,6 +22,8 @@ def update(e_set_config, rebuild = False):
         networks = na.find_networks(e_set_config)
 
         print "Found " + str(len(networks)) + " networks"
+        for dd_net in networks:
+            print dd_net.get("externalId")
 
         # TODO: remove e_sets that are not found in the query
 
@@ -36,10 +38,11 @@ def update(e_set_config, rebuild = False):
             for network in networks:
                 network_id = network.get("externalId")
                 network_name = network.get("name")
+
                 modification_date = network.get("modificationTime")
                 id_set = e_set.get_id_set_by_network_id(network_id)
                 if id_set:
-                    if not id_set.modificationDate == modification_date:
+                    if id_set.get("modificationDate") is not None and not id_set.modificationDate == modification_date:
                         networks_to_update[network_name] = network_id
                 else:
                     networks_to_update[network_name] = network_id
@@ -49,28 +52,31 @@ def update(e_set_config, rebuild = False):
         counter = 0
         term_mapper = term2gene_mapper.Term2gene_mapper()
         for network_name, network_id in networks_to_update.iteritems():
-            print network_name.encode('ascii','ignore') + " : " + network_id.encode('ascii','ignore')
-            node_table = na.get_nodes_from_cx(network_id)
-            term_mapper.add_network_nodes(node_table)
-            gene_symbols = get_genes_for_network(node_table, term_mapper)
-            id_set_dict = {
-                "name": network_name,
-                "ids": gene_symbols,
-                "network_id": network_id,
-                "ndex" : e_set_config.ndex,
-                "e_set" : e_set_config.name
-            }
-            id_set = dm.IdentifierSet(id_set_dict)
-            e_set.add_id_set(id_set)
-            counter +=1
-            print str(counter) + " networks indexed."
+            print str(network_id)
+            if True: #str(network_id) == "09f3c90a-121a-11e6-a039-06603eb7f303":
+                print network_name.encode('ascii','ignore') + " : " + network_id.encode('ascii','ignore')
+                node_table = na.get_nodes_from_cx(network_id)
+                term_mapper.add_network_nodes(node_table)
+                gene_symbols = get_genes_for_network(node_table, term_mapper)
+                if(len(gene_symbols) < 1):
+                    print gene_symbols
+                id_set_dict = {
+                    "name": network_name,
+                    "ids": gene_symbols,
+                    "network_id": network_id,
+                    "ndex" : e_set_config.ndex,
+                    "e_set" : e_set_config.name
+                }
+                id_set = dm.IdentifierSet(id_set_dict)
+                e_set.add_id_set(id_set)
+                counter +=1
+                print str(counter) + " networks indexed."
 
         # now that the updated e_set is ready to save, clear the old cached data
         storage.remove_all_id_sets(e_set_config.name)
 
         print "Saving e_set with " + str(len(e_set.get_id_set_names())) + " id_sets"
         e_set.save()
-
 
 def get_genes_for_network(node_table, term_mapper, symbols_only=True):
         all_found = []
@@ -113,7 +119,10 @@ def get_genes_for_network(node_table, term_mapper, symbols_only=True):
             #     genes = self.genes_from_function_term(node["functionTerm"], network_id, network_name, e_set_config.name, report, all_found, node_id)
 
             if not found:
-                all_not_found.append({"node_id":node_id, "names": list(node.get("name"))})
+                if node.get("name") is not None:
+                    all_not_found.append({"node_id":node_id, "names": list(node.get("name"))})
+                else:
+                    all_not_found.append({"node_id":node_id, "names": list("no name")})
 
         print "Found genes for " + str(len(all_found)) + " nodes"
         print "Did not find genes for " + str(len(all_not_found)) + " nodes"

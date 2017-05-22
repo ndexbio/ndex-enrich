@@ -10,7 +10,10 @@ import ndex.client as nc
 import ndex.networkn as networkn
 
 parser = argparse.ArgumentParser(description='build a similarity map from files in an e_set directory')
-
+# map_name='nci_pid_preview'
+# e_set_dir='e_sets'
+# e_set_name='nci_pid_preview'
+# min_sub=0.02
 parser.add_argument('map_name', action='store')
 
 parser.add_argument('e_set_dir', action='store')
@@ -21,8 +24,13 @@ parser.add_argument('min_sub', action='store', type=float)
 
 arg = parser.parse_args()
 
-ndex = nc.Ndex("http://dev.ndexbio.org", "nci-test", "nci-test")
-response = ndex.get_network_as_cx_stream("87276dca-b8dd-11e6-a353-06832d634f41")
+#ndex = nc.Ndex("http://dev.ndexbio.org", "nci-test", "nci-test")
+ndex = nc.Ndex("http://dev2.ndexbio.org", "aarongary", "ccbbucsd")
+#response = ndex.get_network_as_cx_stream("3aeca6e7-c3c5-11e6-a7bc-0660b7976219")
+#response = ndex.get_network_as_cx_stream("981ed28b-1b06-11e7-801c-0660b7976219")
+response = ndex.get_network_as_cx_stream("1e37ed1c-1bbd-11e7-801c-0660b7976219")
+
+
 template_cx = response.json()
 template_network = networkn.NdexGraph(template_cx)
 

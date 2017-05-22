@@ -86,6 +86,18 @@ def save_id_set_dict(e_set_name, id_set_id, id_set_dict):
     json.dump(id_set_dict, file)
     file.close()
 
+    #===========================
+    # Save GSEA file
+    #===========================
+
+    gseafilename = join(e_set_dir + "/../grp/", id_set_dict.get("name") + ".grp")
+    gseafile = open(gseafilename, "w")
+    if id_set_dict.get("ids") is not None:
+        for gene in id_set_dict.get("ids"):
+            gseafile.write(gene + "\n")
+
+    gseafile.close()
+
 def get_e_set_configs(name="config"):
     current_directory = dirname(abspath(__file__))
     filename = join(current_directory, "e_service_configuration", name + ".json")

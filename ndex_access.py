@@ -135,9 +135,14 @@ class NdexAccess():
                             node_table[node_id] = working_node
                         else:
                             working_node = node_table[node_id]
-                            node_alias_set = working_node["name"]
-                            node_alias_set = node_alias_set.union(set(alias_list))
-                            working_node["alias"] = node_alias_set
+                            node_alias_set = working_node.get("name")
+                            if node_alias_set is not None:
+                                node_alias_set = node_alias_set.union(set(alias_list))
+                                working_node["alias"] = node_alias_set
+                            else:
+                                working_node["alias"] = set()
+
+                                print working_node
 
             elif "functionTerms" in fragment:
                 raise ValueError("not handling function terms in this version")

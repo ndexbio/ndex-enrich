@@ -35,7 +35,11 @@ class Term2gene_mapper():
     def add_network_nodes(self, node_table):
         query_string = ""
         for node_id, node in node_table.items():
-            name = list(node.get('name'))[0]
+            if node.get('name') is not None:
+                name = list(node.get('name'))[0]
+            else:
+                name = list(node.get('represents'))[0]
+
             if self.exclude_id(name) is None:
                 query_string = query_string + " " + name
             if node.get('alias'):
