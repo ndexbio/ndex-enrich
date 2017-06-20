@@ -26,7 +26,6 @@ __author__ = 'dexter'
 # python update_e_data.py config_example --rebuild
 
 # body
-
 import argparse
 import updater
 import configuration as conf
@@ -45,6 +44,7 @@ parser.add_argument('--rebuild', dest='rebuild', action='store_const',
 
 arg = parser.parse_args()
 
+# nci_pid_preview e_sets nci_pid_preview 0.02
 config = conf.EServiceConfiguration()
 
 # Load the testing configuration

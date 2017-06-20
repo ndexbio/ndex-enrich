@@ -6,6 +6,7 @@ import csv
 import data_model as dm
 import json
 from os import remove
+import os
 
 # e_data persistence
 # This persistence system uses a local directory
@@ -79,7 +80,7 @@ def get_id_set_data(e_set_name, id_set_file_name):
     else:
         return None
 
-def save_id_set_dict(e_set_name, id_set_id, id_set_dict):
+def save_id_set_dict(e_set_name, id_set_id, id_set_dict, alt_grp_path=None):
     e_set_dir = ensure_e_set_dir(e_set_name)
     filename = join(e_set_dir, id_set_id + ".json")
     file = open(filename, "w")
@@ -89,8 +90,15 @@ def save_id_set_dict(e_set_name, id_set_id, id_set_dict):
     #===========================
     # Save GSEA file
     #===========================
-
-    gseafilename = join(e_set_dir + "/../grp/", id_set_dict.get("name") + ".grp")
+    gseafilename = ''
+    if alt_grp_path is not None:
+        if not os.path.exists(alt_grp_path):
+            os.makedirs(alt_grp_path)
+        gseafilename = join(alt_grp_path, id_set_dict.get("name") + ".grp")
+    else:
+        if not os.path.exists(join(e_set_dir + '..','grp')):
+            os.makedirs(join(e_set_dir + '..','grp'))
+        gseafilename = join(e_set_dir + '..','grp', id_set_dict.get('name') + '.grp')
     gseafile = open(gseafilename, "w")
     if id_set_dict.get("ids") is not None:
         for gene in id_set_dict.get("ids"):

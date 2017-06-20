@@ -7,15 +7,22 @@ from math import sqrt
 # TODO: only one edge between each pair of nodes. Take the best one.
 
 
-def create_similarity_map_from_enrichment_files(map_name, directory, e_set_name, min_subsumption, max_edges=3):
+def create_similarity_map_from_enrichment_files(map_name, directory, e_set_name, min_subsumption, max_edges=3, ext_link_paths=None):
     e_data = dm.EnrichmentData(directory)
     e_data.load_one_eset(e_set_name)
     e_set = e_data.get_e_set(e_set_name)
-    return create_similarity_map(map_name, e_set, min_subsumption, max_edges=max_edges)
+    return create_similarity_map(map_name, e_set, min_subsumption, max_edges=max_edges, ext_link_paths=ext_link_paths)
 
-def create_similarity_map(name, e_set, min_subsumption, id_attribute="genes", max_edges=5):
+def create_similarity_map(name, e_set, min_subsumption, id_attribute="genes", max_edges=5, ext_link_paths=None):
     similarity_graph = NdexGraph()
     similarity_graph.set_name(name)
+
+    if ext_link_paths is None:
+        ext_link_paths = {
+            'BiopaxFile': 'NCI_PID_BIOPAX_2016-06-08-PC2v8-API',
+            'GSEAFile': 'NCI_PID_GSEA_2017-04-06',
+            'serverSubDomain': 'public'
+        }
 
     set_name_to_node_id_map = {}
     id_sets = {}
@@ -31,11 +38,11 @@ def create_similarity_map(name, e_set, min_subsumption, id_attribute="genes", ma
         similarity_graph.set_node_attribute(node_id, "gene count", gene_count)
         similarity_graph.set_node_attribute(node_id, "width", sqrt(gene_count))
         similarity_graph.set_node_attribute(node_id, "ndex:internalLink", "[%s](%s)" % ("<i class='fa fa-eye' aria-hidden='true'></i>&nbsp;&nbsp;&nbsp;View network<br />",network_id))
-
-        externalLink1 = "[%s](%s)" %("<i class='fa fa-download' aria-hidden='true'></i>&nbsp;&nbsp;&nbsp;BioPAX3 file (.owl)<br />","ftp://ftp.ndexbio.org/NCI_PID_BIOPAX_2016-06-08-PC2v8-API/" + network_name.replace(" ", "%20") + ".owl.gz")
-        externalLink2 = "[%s](%s)" % ("<i class='fa fa-download' aria-hidden='true'></i>&nbsp;&nbsp;&nbsp;GSEA gene set (.grp)<br />","ftp://ftp.ndexbio.org/NCI_PID_GSEA_2017-04-06/" + network_name.replace(" ", "%20") + ".grp.gz")
-        externalLink3 = "[%s](%s)" % ("<i class='fa fa-download' aria-hidden='true'></i>&nbsp;&nbsp;&nbsp;CX file (.cx)","http://dev2.ndexbio.org/v2/network/" + network_id + "?download=true")
-        similarity_graph.set_node_attribute(node_id, "ndex:externalLink", [externalLink1, externalLink2, externalLink3])
+        if ext_link_paths is not None:
+            externalLink1 = "[%s](%s)" %("<i class='fa fa-download' aria-hidden='true'></i>&nbsp;&nbsp;&nbsp;BioPAX3 file (.owl)<br />","ftp://ftp.ndexbio.org/" + ext_link_paths.get('BiopaxFile') + "/" + network_name.replace(" ", "%20") + ".owl.gz")
+            externalLink2 = "[%s](%s)" % ("<i class='fa fa-download' aria-hidden='true'></i>&nbsp;&nbsp;&nbsp;GSEA gene set (.grp)<br />","ftp://ftp.ndexbio.org/" + ext_link_paths.get('GSEAFile') + "/" + network_name.replace(" ", "%20") + ".grp.gz")
+            externalLink3 = "[%s](%s)" % ("<i class='fa fa-download' aria-hidden='true'></i>&nbsp;&nbsp;&nbsp;CX file (.cx)","http://" + ext_link_paths.get('serverSubDomain') + ".ndexbio.org/v2/network/" + network_id + "?download=true")
+            similarity_graph.set_node_attribute(node_id, "ndex:externalLink", [externalLink1, externalLink2, externalLink3])
 
         if(network_name == "NCI Pathway Interaction Database - Final Revision"):
             remove_super_nodes.append(node_id)

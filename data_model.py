@@ -62,8 +62,8 @@ class IdentifierSet():
             "e_set" : self.e_set
         }
 
-    def save(self):
-        storage.save_id_set_dict(self.e_set, self.network_id, self.to_dict())
+    def save(self, alt_grp_path=None):
+        storage.save_id_set_dict(self.e_set, self.network_id, self.to_dict(), alt_grp_path)
 
     # compare this id_set to a query_id_set
     def get_enrichment_score(self, query_id_set_n, M, overlap_n):
@@ -172,10 +172,10 @@ class EnrichmentSet():
                 id_set = IdentifierSet(id_set_dict)
                 self.add_id_set(id_set)
 
-    def save(self):
+    def save(self, alt_grp_path=None):
         storage.ensure_e_set_dir(self.name)
         for set_name, id_set in self.id_set_map.iteritems():
-            id_set.save()
+            id_set.save(alt_grp_path)
 
     def get_id_set_names(self, request_url=None):
         urls = []
